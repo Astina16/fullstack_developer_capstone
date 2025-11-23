@@ -1,0 +1,51 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    </head>
+<body>
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color:darkturquoise; height: 1in;">
+            <div class="container-fluid">
+                <h2 style="padding-right: 5%;">Dealerships</h2>
+                <div class="collapse navbar-collapse" id="navbarText">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" style="font-size: larger;" aria-current="page" href="{% url 'index' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" style="font-size: larger;" href="{% url 'about' %}">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" style="font-size: larger;" href="{% url 'contact' %}">Contact Us</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container mt-5" style="width: 50%; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+            <form action="{% url 'login' %}" method="post" style="text-align: center;">
+                {% csrf_token %}
+                <div style="margin-bottom: 15px;">
+                    <label for="username" style="display: inline-block; width: 80px; text-align: right; margin-right: 10px;">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="password" style="display: inline-block; width: 80px; text-align: right; margin-right: 10px;">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                
+                <div style="margin-bottom: 10px;">
+                    <button type="submit">Login</button>
+                    <button type="button" onclick="history.back()">Cancel</button>
+                </div>
+                
+                <p><a href="{% url 'register' %}">Register Now</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

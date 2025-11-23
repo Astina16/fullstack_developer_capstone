@@ -1,0 +1,121 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Cars Dealerships</title>
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:darkturquoise;">
+        <div class="container-fluid">
+            <h2 style="padding-right: 5%;">Dealerships</h2>
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'about' %}">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contact' %}">Contact Us</a>
+                </li>
+            </ul>
+
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">Welcome, **{{ user.username }}**</span>
+                    <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a class="btn btn-outline-light me-2" href="{% url 'login' %}">Login</a>
+                    <a class="btn btn-primary" href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <h1 class="text-center mt-4">Welcome to Best Cars!</h1>
+<div class="container mt-4 mb-4">
+    <form method="get" action="{% url 'index' %}" class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label for="state-filter" class="col-form-label">Filter by State:</label>
+        </div>
+        <div class="col-auto">
+            <select name="state" id="state-filter" class="form-select">
+                <option value="" selected>All States</option>
+                <option value="TX">Texas</option>
+                <option value="CA">California</option>
+                <option value="NY">New York</option>
+                <option value="KS">Kansas</option>
+                </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-info">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="container mt-4 mb-4">
+    <form method="get" action="{% url 'index' %}" class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label for="state-filter" class="col-form-label">Filter by State:</label>
+        </div>
+        <div class="col-auto">
+            <select name="state" id="state-filter" class="form-select">
+                <option value="" selected>All States</option>
+                <option value="TX">Texas</option>
+                <option value="CA">California</option>
+                <option value="NY">New York</option>
+                <option value="KS">Kansas</option>
+                </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-info">Filter</button>
+        </div>
+    </form>
+</div>
+
+    <div class="container mt-5">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Dealer Name</th>
+                    <th>City</th>
+                    <th>Address</th>
+                    <th>Zip</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dealer in dealerships %}
+                <tr>
+                    <td><a href="{% url 'dealer_details' dealer.id %}">{{ dealer.full_name }}</a></td>
+                    <td>{{ dealer.city }}</td>
+                    <td>{{ dealer.address }}</td>
+                    <td>{{ dealer.zip }}</td>
+                    <td>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'add_review' dealer.id %}" class="btn btn-primary btn-sm">Post Review</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+    // Check if the URL contains the 'logout_success=true' query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('logout_success') === 'true') {
+        alert('You have been logged out successfully!');
+        
+        // Clean the URL bar to remove the success parameter
+        if (window.history.replaceState) {
+            const clean_url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({path: clean_url}, '', clean_url);
+        }
+    }
+</script>
+</body>
+</html>

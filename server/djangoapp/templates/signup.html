@@ -1,0 +1,90 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        /* Basic inline styling to mimic the target image layout */
+        body { background-color: #e0f7fa; }
+        .signup-container {
+            width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            width: 30px;
+            font-size: 1.5em; /* For icon placeholders */
+            margin-right: 15px;
+            color: #00bcd4;
+        }
+        .form-group input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn-register {
+            width: 80%;
+            padding: 15px;
+            background-color: #8e24aa;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .header {
+            color: #00bcd4;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h1 class="header">New Registration</h1>
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>👤</label> 
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            
+            <div class="form-group">
+                <label>👤</label> 
+                <input type="text" name="first_name" placeholder="First Name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>👤</label> 
+                <input type="text" name="last_name" placeholder="Last Name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>📧</label>
+                <input type="email" name="email" placeholder="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label>🔒</label> 
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            
+            <button type="submit" class="btn-register">Register</button>
+        </form>
+    </div>
+</body>
+</html>

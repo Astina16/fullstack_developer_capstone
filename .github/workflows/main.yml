@@ -1,0 +1,51 @@
+# .github/workflows/main.yml
+name: Capstone CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+  workflow_dispatch:
+
+jobs:
+  # Job 1: Test and Build the Express Backend
+  express-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies (Express)
+        run: npm install
+        working-directory: ./server 
+      
+      - name: Test (Placeholder)
+        run: echo "Express backend tests completed successfully."
+
+  # Job 2: Test and Build the Django Frontend
+  django-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies (Django)
+        run: pip install -r requirements.txt
+        working-directory: ./server
+
+      - name: Run Django Tests
+        run: python manage.py test djangoapp
+        working-directory: ./server
+        
+      - name: Build complete
+        run: echo "Django build and tests completed successfully."

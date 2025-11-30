@@ -80,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'djangoproj.wsgi.application'
+ROOT_URLCONF = "djangoproj.urls"
 
 
 # Database

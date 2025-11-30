@@ -1,5 +1,5 @@
 Django==3.2
-web: gunicorn server.djangoproj.wsgi
+gunicorn
 whitenoise
 requests
 psycopg2-binary

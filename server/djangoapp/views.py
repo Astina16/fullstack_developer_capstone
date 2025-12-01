@@ -177,3 +177,15 @@ def add_review(request, dealer_id):
 # Placeholder for Sentiment Analysis Proxy (Task 16)
 def sentiment_analysis(request):
     return JsonResponse({'message': 'Sentiment analysis proxy service running.'})
+
+def analyze_review_sentiments(text):
+    url = "https://fullstack-developer-capstone-2.onrender.com/sentiment"
+    try:
+        response = requests.get(url, params={"text": text})
+        if response.status_code == 200:
+            return response.json().get("sentiment")
+        else:
+            return "UNKNOWN"
+    except Exception as e:
+        print("Error calling sentiment API:", e)
+        return "ERROR"

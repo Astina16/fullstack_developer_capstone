@@ -57,7 +57,7 @@ def login_request(request):
         
         if user is not None:
             login(request, user)
-            return redirect('index')
+            return redirect('/')   # FIXED
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     

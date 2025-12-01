@@ -16,37 +16,27 @@ SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentime
 # HOME PAGE — FETCH DEALERS
 # ------------------------------
 
-def get_dealer_details(request, dealer_id):
-    dealer = {}
-    reviews_data = []
+def get_dealers(request):
+    state_filter = request.GET.get("state")
+
+    api_url = f"{BASE_API_URL}/fetchDealers"
+    dealerships = []
 
     try:
-        # 1. Fetch Dealer Details
-        dealer_url = f"{BASE_API_URL}/fetchDealer/{dealer_id}"
-        dealer_response = requests.get(dealer_url)
-
-        if dealer_response.status_code == 200:
-            dealer_list = dealer_response.json()
-            if dealer_list and isinstance(dealer_list, list):
-                dealer = dealer_list[0]
-
-        # 2. Fetch Dealer Reviews  (FIXED ROUTE)
-        reviews_url = f"{BASE_API_URL}/reviews/{dealer_id}"
-        reviews_response = requests.get(reviews_url)
-
-        if reviews_response.status_code == 200:
-            reviews_data = reviews_response.json()
-
+        response = requests.get(api_url, timeout=10)
+        if response.status_code == 200:
+            dealerships = response.json()
     except Exception as e:
-        print("ERROR fetching dealer or reviews:", e)
+        print("Error loading dealers:", e)
 
-    context = {
-        'dealer': dealer,
-        'reviews': reviews_data,
-        'dealer_id': dealer_id
-    }
-    
-    return render(request, 'dealer_details.html', context)
+    # Optional filtering
+    if state_filter and state_filter.lower() != "all states":
+        dealerships = [
+            d for d in dealerships
+            if "state" in d and d["state"].lower() == state_filter.lower()
+        ]
+
+    return render(request, "home.html", {"dealerships": dealerships})
 
 
 # ------------------------------

@@ -5,7 +5,9 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = 3030;
+
+// Render MUST use process.env.PORT
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -20,7 +22,9 @@ const ATLAS_URI = "mongodb+srv://capstone_user:GxgilUjEMG5R3jjv@capstonedb.0bdcu
 const Reviews = require('./review');
 const Dealerships = require('./dealership');
 
-// Mongo Connection + Auto Seed
+// -------------------------------
+// MONGO CONNECTION + SEEDING
+// -------------------------------
 mongoose.connect(ATLAS_URI)
   .then(async () => {
     console.log("MongoDB connected.");
@@ -38,6 +42,14 @@ mongoose.connect(ATLAS_URI)
 
 
 // -------------------------------
+// HEALTH CHECK ROUTE (VERY IMPORTANT FOR RENDER)
+// -------------------------------
+app.get("/", (req, res) => {
+  res.send("Express backend is running (Render)");
+});
+
+
+// -------------------------------
 // ROUTES
 // -------------------------------
 
@@ -48,12 +60,12 @@ app.get("/reviews", async (req, res) => {
 
 // Get reviews for a dealer
 app.get("/reviews/:dealerId", async (req, res) => {
-  const id = Number(req.params.dealerId);   // force number
+  const id = Number(req.params.dealerId);  
   const reviews = await Reviews.find({ dealership: id });
   res.json(reviews);
 });
 
-// Insert a new review
+// Insert a review
 app.post('/reviews/add', async (req, res) => {
   try {
     const latest = await Reviews.findOne().sort({ id: -1 });
@@ -61,7 +73,7 @@ app.post('/reviews/add', async (req, res) => {
 
     const review = new Reviews({
       ...req.body,
-      dealership: Number(req.body.dealership), // force number
+      dealership: Number(req.body.dealership),
       id: new_id
     });
 
@@ -73,7 +85,7 @@ app.post('/reviews/add', async (req, res) => {
   }
 });
 
-// Dealers
+// Dealer endpoints
 app.get('/fetchDealer/:id', async (req, res) => {
   res.json(await Dealerships.find({ id: Number(req.params.id) }));
 });
@@ -82,4 +94,8 @@ app.get('/fetchDealers', async (req, res) => {
   res.json(await Dealerships.find());
 });
 
-app.listen(port, () => console.log("Express running on", port));
+
+// -------------------------------
+// START SERVER
+// -------------------------------
+app.listen(PORT, () => console.log("Express running on", PORT));

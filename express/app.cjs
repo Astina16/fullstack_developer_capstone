@@ -59,11 +59,19 @@ app.get("/reviews", async (req, res) => {
 });
 
 // Get reviews for a dealer
-app.get("/reviews/:dealerId", async (req, res) => {
-  const id = Number(req.params.dealerId);  
-  const reviews = await Reviews.find({ dealership: id });
-  res.json(reviews);
+app.get("/fetchReviews/dealer/:dealerId", async (req, res) => {
+    try {
+        const dealerId = parseInt(req.params.dealerId);
+
+        const reviews = await Review.find({ dealership: dealerId });
+
+        return res.status(200).json(reviews);
+    } catch (error) {
+        console.error("Error fetching reviews:", error);
+        return res.status(500).json({ error: "Failed to fetch reviews" });
+    }
 });
+
 
 // Insert a review
 app.post('/reviews/add', async (req, res) => {
@@ -99,3 +107,4 @@ app.get('/fetchDealers', async (req, res) => {
 // START SERVER
 // -------------------------------
 app.listen(PORT, () => console.log("Express running on", PORT));
+

@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from datetime import datetime
 
 # --- Configuration ---
-BASE_API_URL = "https://fullstack-developer-capstone-1.onrender.com"
+BASE_API_URL = "https://fullstack-developer-capstone-3.onrender.com"
 SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentiment"
 
 # --- Static/Homepage Views (NO CHANGES NEEDED HERE) ---

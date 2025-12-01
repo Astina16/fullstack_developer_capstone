@@ -11,7 +11,7 @@ class DjangoappConfig(AppConfig):
 
         try:
             # Auto-create default login user if missing
-            if not User.objects.filter(username='astin').exists():
+            if not User.objects.filter(username='admin').exists():
                 User.objects.create_user(
                     username='admin',
                     password='admin123',

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "fullstack-developer-capstone-1-38l0.onrender.com",
+    "https://fullstack-developer-capstone-1-fv6e.onrender.com/"
 ]
 
 

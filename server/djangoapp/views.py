@@ -32,7 +32,9 @@ def get_dealers(request):
     except Exception as e:
         print(">>> ERROR CALLING EXPRESS:", e)
 
+    # Render home page
     return render(request, "home.html", {"dealerships": dealerships})
+
 
     # 2. Filter data in Python based on the state_filter (Case-Insensitive)
     if state_filter and state_filter.lower() != 'all states':

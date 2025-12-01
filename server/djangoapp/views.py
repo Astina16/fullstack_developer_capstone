@@ -13,21 +13,32 @@ SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentime
 # --- Static/Homepage Views (NO CHANGES NEEDED HERE) ---
 
 def get_dealers(request):
+
+    # Always call the Express API EXACTLY here:
+    api_url = "https://fullstack-developer-capstone-3.onrender.com/fetchDealers"
+
     state_filter = request.GET.get('state')
-    api_url = f"{BASE_API_URL}/fetchDealers"
     dealerships = []
-    
-    # ... (rest of get_dealers logic) ...
-    
+
     try:
-        response = requests.get(api_url)
-        if response.status_code == 200: 
+        response = requests.get(api_url, timeout=5)
+        if response.status_code == 200:
             all_dealers = response.json()
         else:
             all_dealers = []
-    except requests.exceptions.ConnectionError:
+    except:
         all_dealers = []
-        print("CONNECTION ERROR: Express server (3030) is not accessible.")
+
+    # Filter if needed
+    if state_filter and state_filter.lower() != "all states":
+        dealerships = [
+            d for d in all_dealers
+            if d.get('state', '').lower() == state_filter.lower()
+        ]
+    else:
+        dealerships = all_dealers
+
+    return render(request, "home.html", {"dealerships": dealerships})
 
     # 2. Filter data in Python based on the state_filter (Case-Insensitive)
     if state_filter and state_filter.lower() != 'all states':

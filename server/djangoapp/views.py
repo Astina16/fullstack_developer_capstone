@@ -39,7 +39,7 @@ def get_dealers(request):
         dealerships = all_dealers
 
     context = {'dealerships': dealerships}
-    return render(request, 'Home.html', context)
+    return render(request, 'home.html', context)
 
 def about(request):
     return render(request, 'about.html') 

@@ -63,7 +63,7 @@ app.get("/fetchReviews/dealer/:dealerId", async (req, res) => {
     try {
         const dealerId = parseInt(req.params.dealerId);
 
-        const reviews = await Review.find({ dealership: dealerId });
+        const reviews = await Reviews.find({ dealership: dealerId });
 
         return res.status(200).json(reviews);
     } catch (error) {
@@ -107,4 +107,5 @@ app.get('/fetchDealers', async (req, res) => {
 // START SERVER
 // -------------------------------
 app.listen(PORT, () => console.log("Express running on", PORT));
+
 

@@ -13,11 +13,12 @@ SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentime
 # --- Static/Homepage Views (NO CHANGES NEEDED HERE) ---
 
 def get_dealers(request):
+    state_filter = request.GET.get("state")
 
     api_url = f"{BASE_API_URL}/fetchDealers"
-    print(">>> Calling Express API:", api_url)
-
     dealerships = []
+
+    print(">>> Calling Express API:", api_url)
 
     try:
         response = requests.get(api_url, timeout=10)
@@ -32,10 +33,15 @@ def get_dealers(request):
     except Exception as e:
         print(">>> ERROR CALLING EXPRESS:", e)
 
-    # Render home page
+    # ---- APPLY FILTER ----
+    if state_filter and state_filter.lower() != "all states":
+        dealerships = [
+            d for d in dealerships 
+            if d.get("state", "").lower() == state_filter.lower()
+        ]
+
     return render(request, "home.html", {"dealerships": dealerships})
-
-
+    
     # 2. Filter data in Python based on the state_filter (Case-Insensitive)
     if state_filter and state_filter.lower() != 'all states':
         target_state_lower = state_filter.lower() 

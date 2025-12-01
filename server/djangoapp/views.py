@@ -8,7 +8,7 @@ from datetime import datetime
 
 # --- Configuration ---
 BASE_API_URL = "http://localhost:3030" 
-SENTIMENT_API_URL = "http://localhost:5000/sentiment" # <-- Added Sentiment API URL
+SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/predict" # <-- Added Sentiment API URL
 
 # --- Static/Homepage Views (NO CHANGES NEEDED HERE) ---
 

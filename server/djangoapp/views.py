@@ -11,26 +11,35 @@ BASE_API_URL = "https://fullstack-developer-capstone-3.onrender.com"
 SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentiment"
 
 # --- Static/Homepage Views (NO CHANGES NEEDED HERE) ---
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
+import requests
+from django.contrib.auth.models import User
+from datetime import datetime
 
+# -------------------------
+# CONFIGURATION
+# -------------------------
+BASE_API_URL = "https://fullstack-developer-capstone-3.onrender.com"
+SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentiment"
+
+
+# -------------------------
+# HOME PAGE – SHOW DEALERS
+# -------------------------
 def get_dealers(request):
     state_filter = request.GET.get('state')
 
     api_url = f"{BASE_API_URL}/fetchDealers"
-    print(">>> Calling Express API:", api_url)
-
     dealerships = []
 
     try:
         response = requests.get(api_url, timeout=10)
-        print(">>> STATUS:", response.status_code)
-
         if response.status_code == 200:
             dealerships = response.json()
-            print(">>> DEALERS RETURNED:", len(dealerships))
-        else:
-            print(">>> BAD RESPONSE:", response.text)
     except Exception as e:
-        print(">>> ERROR CALLING EXPRESS:", e)
+        print("ERROR calling dealers API:", e)
 
     # Optional filtering
     if state_filter and state_filter.lower() != "all states":
@@ -40,6 +49,155 @@ def get_dealers(request):
         ]
 
     return render(request, "home.html", {"dealerships": dealerships})
+
+
+def about(request):
+    return render(request, "about.html")
+
+
+def contact(request):
+    return render(request, "contact.html")
+
+
+# -------------------------
+# AUTHENTICATION
+# -------------------------
+def login_request(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect("/")  # Home page
+        else:
+            return render(request, "login.html", {"error": "Invalid username or password"})
+
+    return render(request, "login.html")
+
+
+def logout_request(request):
+    logout(request)
+    return redirect("/?logout_success=true")
+
+
+def registration_request(request):
+    if request.method == "POST":
+        pass
+    return render(request, "signup.html")
+
+
+# -------------------------
+# DEALER DETAILS + REVIEWS
+# -------------------------
+def get_dealer_details(request, dealer_id):
+    dealer = {}
+    reviews = []
+
+    try:
+        # 1. Fetch dealer details
+        dealer_url = f"{BASE_API_URL}/fetchDealer/{dealer_id}"
+        dealer_resp = requests.get(dealer_url)
+        if dealer_resp.status_code == 200:
+            dealer_list = dealer_resp.json()
+            if dealer_list:
+                dealer = dealer_list[0]
+
+        # 2. Fetch dealer reviews
+        reviews_url = f"{BASE_API_URL}/reviews/{dealer_id}"
+        reviews_resp = requests.get(reviews_url)
+        if reviews_resp.status_code == 200:
+            reviews = reviews_resp.json()
+
+    except Exception as e:
+        print("ERROR fetching dealer or reviews:", e)
+
+    context = {
+        "dealer": dealer,
+        "reviews": reviews,
+        "dealer_id": dealer_id,
+    }
+
+    return render(request, "dealer_details.html", context)
+
+
+# -------------------------
+# ADD REVIEW
+# -------------------------
+def add_review(request, dealer_id):
+    if request.method == "POST":
+        review_text = request.POST.get("review_content")
+        car_make = request.POST.get("car_make")
+        car_model = request.POST.get("car_model")
+        car_year = request.POST.get("car_year")
+        purchase_date = request.POST.get("purchase_date")
+
+        # ---- SENTIMENT ----
+        sentiment = "NEUTRAL"
+        try:
+            sentiment_resp = requests.get(SENTIMENT_API_URL, params={"text": review_text})
+            if sentiment_resp.status_code == 200:
+                sentiment = sentiment_resp.json().get("sentiment", "NEUTRAL")
+        except:
+            pass
+
+        # Payload for Express backend
+        data = {
+            "id": -1,
+            "name": request.user.username,
+            "dealership": dealer_id,
+            "review": review_text,
+            "purchase": "purchase_check" in request.POST,
+            "purchase_date": purchase_date,
+            "car_make": car_make,
+            "car_model": car_model,
+            "car_year": car_year,
+            "sentiment": sentiment,
+        }
+
+        # POST to Express
+        try:
+            post_url = f"{BASE_API_URL}/insert_review"
+            response = requests.post(post_url, json=data)
+
+            if response.status_code == 200 or response.status_code == 201:
+                return redirect("dealer_details", dealer_id=dealer_id)
+
+        except Exception as e:
+            print("ERROR posting review:", e)
+
+    # GET request → show form
+    dealer = {}
+    try:
+        dealer_resp = requests.get(f"{BASE_API_URL}/fetchDealer/{dealer_id}")
+        if dealer_resp.status_code == 200:
+            dealer_list = dealer_resp.json()
+            if dealer_list:
+                dealer = dealer_list[0]
+    except:
+        pass
+
+    return render(request, "add_review.html", {"dealer": dealer, "dealer_id": dealer_id})
+
+
+# -------------------------
+# SENTIMENT (PLACEHOLDER)
+# -------------------------
+def sentiment_analysis(request):
+    return JsonResponse({"message": "Sentiment service running"})
+
+
+def analyze_review_sentiments(text):
+    try:
+        response = requests.get(SENTIMENT_API_URL, params={"text": text})
+        if response.status_code == 200:
+            return response.json().get("sentiment")
+        return "UNKNOWN"
+    except:
+        return "ERROR"
+
 
     
     # 2. Filter data in Python based on the state_filter (Case-Insensitive)

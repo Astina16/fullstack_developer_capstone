@@ -132,19 +132,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 # Static & media (production-ready)
 STATIC_URL = "/static/"
-
-# Where `collectstatic` will put the files for production
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# Folders Django will search for static files during development/collectstatic.
-# Update this path to point to your app's static directory.
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "server", "djangoapp", "static"),
+    os.path.join(BASE_DIR, "djangoapp", "static"),
 ]
 
-# Media (uploads)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# Use Whitenoise storage for compressed static files in production
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify # Import request and jsonify
 from nltk.sentiment.vader import SentimentIntensityAnalyzer # Use specific VADER import
 import json
+import os
 
 app = Flask("Sentiment Analyzer")
 sia = SentimentIntensityAnalyzer()
@@ -38,4 +39,5 @@ def analyze_sentiment():
 
 if __name__ == "__main__":
     # Set host='0.0.0.0' to ensure accessibility from localhost
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 3030))
+    app.run(host="0.0.0.0", port=port)

@@ -14,29 +14,23 @@ SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentime
 
 def get_dealers(request):
 
-    # Always call the Express API EXACTLY here:
-    api_url = "https://fullstack-developer-capstone-3.onrender.com/fetchDealers"
+    api_url = f"{BASE_API_URL}/fetchDealers"
+    print(">>> Calling Express API:", api_url)
 
-    state_filter = request.GET.get('state')
     dealerships = []
 
     try:
-        response = requests.get(api_url, timeout=5)
-        if response.status_code == 200:
-            all_dealers = response.json()
-        else:
-            all_dealers = []
-    except:
-        all_dealers = []
+        response = requests.get(api_url, timeout=10)
+        print(">>> STATUS:", response.status_code)
 
-    # Filter if needed
-    if state_filter and state_filter.lower() != "all states":
-        dealerships = [
-            d for d in all_dealers
-            if d.get('state', '').lower() == state_filter.lower()
-        ]
-    else:
-        dealerships = all_dealers
+        if response.status_code == 200:
+            dealerships = response.json()
+            print(">>> DEALERS RETURNED:", len(dealerships))
+        else:
+            print(">>> BAD RESPONSE:", response.text)
+
+    except Exception as e:
+        print(">>> ERROR CALLING EXPRESS:", e)
 
     return render(request, "home.html", {"dealerships": dealerships})
 

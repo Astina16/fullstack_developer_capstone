@@ -43,17 +43,13 @@ mongoose
   .then(async () => {
     console.log("MongoDB connected.");
 
-    const count = await Dealerships.countDocuments();
-
+const count = await Dealerships.countDocuments();
     if (count === 0) {
-      console.log("Seeding database...");
-      await Reviews.deleteMany({});
-      await Dealerships.deleteMany({});
-      await Reviews.insertMany(reviews_data.reviews);
+      console.log("Seeding database once...");
       await Dealerships.insertMany(dealerships_data.dealerships);
-      console.log("Database seeded.");
+      await Reviews.insertMany(reviews_data.reviews)
     }
-  })
+
   .catch((err) => console.error("MongoDB connection failed:", err));
 
 
@@ -141,3 +137,4 @@ app.get("/fetchDealers", async (req, res) => {
 app.listen(PORT, () =>
   console.log(`Express server running on port ${PORT}`)
 );
+

@@ -8,7 +8,7 @@ from datetime import datetime
 # CONSTANTS
 # ------------------------------
 
-BASE_API_URL = "https://fullstack-developer-capstone-3.onrender.com"
+BASE_API_URL = "https://fullstack-developer-capstone-1.onrender.com"
 SENTIMENT_API_URL = "https://fullstack-developer-capstone-2.onrender.com/sentiment"
 
 

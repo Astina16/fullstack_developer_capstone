@@ -20,27 +20,47 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // -------------------------------
-// DATABASE + SEEDING
+// LOAD JSON SEED FILES
 // -------------------------------
-const ATLAS_URI = "mongodb+srv://capstone_user:GxgilUjEMG5R3jjv@capstonedb.0bdcuyf.mongodb.net/dealershipsDB?retryWrites=true&w=majority";
+const reviews_data = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "data", "reviews.json"))
+);
 
-mongoose.connect(ATLAS_URI)
+const dealerships_data = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "data", "dealerships.json"))
+);
+
+// -------------------------------
+// DATABASE + PERMANENT SEEDING
+// -------------------------------
+const ATLAS_URI =
+  "mongodb+srv://capstone_user:GxgilUjEMG5R3jjv@capstonedb.0bdcuyf.mongodb.net/dealershipsDB";
+
+mongoose
+  .connect(ATLAS_URI)
   .then(async () => {
     console.log("MongoDB connected.");
 
-    const dealerCount = await Dealerships.countDocuments();
-    if (dealerCount === 0) {
-      await Dealerships.insertMany(dealerships_data.dealerships);
-      console.log("Dealerships seeded.");
+    // Seed dealerships if they don't exist
+    for (let dealer of dealerships_data.dealerships) {
+      const exists = await Dealerships.findOne({ id: dealer.id });
+      if (!exists) {
+        await Dealerships.create(dealer);
+        console.log("Seeded dealer:", dealer.id);
+      }
     }
 
-    const reviewCount = await Reviews.countDocuments();
-    if (reviewCount === 0) {
-      await Reviews.insertMany(reviews_data.reviews);
-      console.log("Reviews seeded.");
+    // Seed reviews if they don't exist
+    for (let review of reviews_data.reviews) {
+      const exists = await Reviews.findOne({ id: review.id });
+      if (!exists) {
+        await Reviews.create(review);
+        console.log("Seeded review:", review.id);
+      }
     }
   })
-  .catch(err => console.error("MongoDB connection failed:", err));
+  .catch((err) => console.error("MongoDB connection failed:", err));
+
 
 // -------------------------------
 // ROOT CHECK
@@ -53,8 +73,7 @@ app.get("/", (req, res) => {
 // FETCH ALL REVIEWS
 // -------------------------------
 app.get("/reviews", async (req, res) => {
-  const all = await Reviews.find();
-  res.json(all);
+  res.json(await Reviews.find());
 });
 
 // -------------------------------
@@ -63,12 +82,9 @@ app.get("/reviews", async (req, res) => {
 app.get("/fetchReviews/dealer/:dealerId", async (req, res) => {
   try {
     const dealerId = Number(req.params.dealerId);
-
-    // Correct model name
     const reviews = await Reviews.find({ dealership: dealerId });
 
     return res.status(200).json(reviews);
-
   } catch (error) {
     console.error("Error fetching reviews:", error);
     return res.status(500).json({ error: "Failed to fetch reviews" });
@@ -76,22 +92,20 @@ app.get("/fetchReviews/dealer/:dealerId", async (req, res) => {
 });
 
 // -------------------------------
-// INSERT REVIEW  (THIS IS WHAT DJANGO CALLS)
+// INSERT REVIEW (CALLED BY DJANGO)
 // -------------------------------
 app.post("/insert_review", async (req, res) => {
   try {
     const latest = await Reviews.findOne().sort({ id: -1 });
     const newId = latest ? latest.id + 1 : 1;
 
-    const newReview = new Reviews({
+    const saved = await Reviews.create({
       ...req.body,
+      id: newId,
       dealership: Number(req.body.dealership),
-      id: newId
     });
 
-    const saved = await newReview.save();
     res.status(201).json(saved);
-
   } catch (error) {
     console.error("Insert review failed:", error);
     res.status(500).json({ error: "Error inserting review" });
@@ -99,7 +113,7 @@ app.post("/insert_review", async (req, res) => {
 });
 
 // -------------------------------
-// DEALERS
+// DEALER ROUTES
 // -------------------------------
 app.get("/fetchDealers", async (req, res) => {
   res.json(await Dealerships.find());
@@ -115,4 +129,3 @@ app.get("/fetchDealer/:id", async (req, res) => {
 app.listen(PORT, () =>
   console.log(`Express backend running on port ${PORT}`)
 );
-

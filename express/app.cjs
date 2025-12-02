@@ -28,20 +28,16 @@ mongoose.connect(ATLAS_URI)
   .then(async () => {
     console.log("MongoDB connected.");
 
-    const count = await Dealerships.countDocuments();
-
-    if (count === 0) {
-      console.log("Seeding database...");
-
-      const reviews_data = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "reviews.json")));
-      const dealerships_data = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "dealerships.json")));
-
-      await Reviews.deleteMany({});
-      await Dealerships.deleteMany({});
-      await Reviews.insertMany(reviews_data.reviews);
+    const dealerCount = await Dealerships.countDocuments();
+    if (dealerCount === 0) {
       await Dealerships.insertMany(dealerships_data.dealerships);
+      console.log("Dealerships seeded.");
+    }
 
-      console.log("Database seeded.");
+    const reviewCount = await Reviews.countDocuments();
+    if (reviewCount === 0) {
+      await Reviews.insertMany(reviews_data.reviews);
+      console.log("Reviews seeded.");
     }
   })
   .catch(err => console.error("MongoDB connection failed:", err));
@@ -119,3 +115,4 @@ app.get("/fetchDealer/:id", async (req, res) => {
 app.listen(PORT, () =>
   console.log(`Express backend running on port ${PORT}`)
 );
+
